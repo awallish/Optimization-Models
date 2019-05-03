@@ -1,0 +1,18 @@
+Maybe we don't require that all funds be invested, so we can define another guaranteed return function (perhaps a bond) which is strictly monotonic and increasing.  f(x) = 1.001x for example
+
+
+
+What if we don't have to invest discrete amounts? What is the time complexity of taking a derivative? -- time complexity is O(n) so this wouldn't help --
+wait, but we can compute the derivitaves in advance and cache them, right?
+Nah, this is a bit of a wormhole.  We're not going to consider non-discrete
+
+
+
+Solution to the trivial problem is (X+1)(P) where P is the number of investement projects and X is the discrete amount you have to invest
+Runtime complexity: O(X*P)
+
+
+
+in reality, f(0) <= 0 for any return function f (you're not going to get a positive return for investing zero, right?)
+
+
