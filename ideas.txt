@@ -13,9 +13,12 @@ Runtime complexity: O(X*P)
 
 
 
-in reality, f(0) <= 0 for any return function f (you're not going to get a positive return for investing zero, right?)
+in reality, f(0) = 0 for any return function f (you're not going to get a positive return for investing zero, right?)
 
 
 
 
 Maybe i need to do this iteratively so that we can have the complete expanded form 
+
+
+stochastic calculus

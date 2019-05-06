@@ -26,32 +26,36 @@ amounts = []
 
 cache = dict()
 
-
+# at each stage return/cache how we got there
 
 def V(j, x):
 	if (j, x) in cache:
-		print("yes")
+		#print("yes")
 		return cache[(j,x)]
 	if j == 1:
 		l = functions[j](x)
-		cache[(j,x)] = l
-		return l
+		cache[(j,x)] = (l, [x])
+		return cache[(j,x)]
 
 	else:
-		
-		maximum = -float('inf')
+		maximum = (-float('inf'), None)
 		mac = 0
 		for y in range(0, x):
 
-			curr = V(j-1, x-y) + functions[j](y)  # when we recurse to the very top this will be all the way expanded out
+			lek = V(j-1, x-y) 
+	  # when we recurse to the very top this will be all the way expanded out
+			curr = (lek[0] + functions[j](y), lek[1])
 			if curr > maximum:
-				maximum = curr
+				maximum = curr 
 				mac = y
-		amounts.append(mac)
+		while j <= len(maximum[1]) and sum([(functions[i](x)) for i, x in enumerate(maximum[1])]) != maximum[1]:
+			maximum[1].pop()
+		maximum[1].append(mac)
 		cache[(j, x)] = maximum
-		return maximum
-
+		print(j, maximum)
+		return cache[(j,x)]
 """
+
 		res = max([(lambda y: (functions[j](y) + V(j-1, x-y)))(y) for y in range(0, x)])
 		cache[(j, x)] = res
 		return res
@@ -61,8 +65,10 @@ def V(j, x):
 def maximal_return(m, n):
 	return V(n, m)
 
-print(V(3, 5))
-print(amounts)
+print(V(3, 10))
+
+print(sum([f1(2), f2(1), f3(2)]))
+print(sum([f1(5), f2(2), f3(3)]))
 
 
 
