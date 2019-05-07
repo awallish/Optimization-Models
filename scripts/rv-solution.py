@@ -28,28 +28,27 @@ class Portfolio:
 
 	# recursive helper
 	def V(self, j, x, sigma):
-		if (j, x) in self.cache:
+		if sigma < 0:
+			return (-float('inf'), 0, [x])
+		elif (j, x) in self.cache:
 			return self.cache[(j, x)]
 		elif j == 1:
-			self.cache[(j, x)] = (self.expectations[j](x), self.variances[j](x), [x])
-			return self.cache[(j, x)]
+			if sigma - self.variances[j](x) >= 0:
+				self.cache[(j, x)] = (self.expectations[j](x), self.variances[j](x), [x])
+				return self.cache[(j, x)]
+			else:
+				return (-float('inf'), 0, [x])
 		else:
-			maximum = (-float('inf'), 0, [])
+			maximum = (-float('inf'), 0, [x])
 			max_allocation = None
-			for y in range(0, x):
+			for y in range(0, x+1):
 				temp = self.V(j-1, x-y, sigma-self.variances[j](y))
 				curr = (temp[0] + self.expectations[j](y), temp[1] + self.variances[j](y), temp[2].copy())
-				if curr > maximum and curr[1] <= sigma:
+				if curr > maximum:
 					maximum = curr
 					max_allocation = y
-				# minimizes variance, if two returns have same expectation
-				elif curr == maximum and curr[1] <= maximum[1]:
-					maximum = curr
-					max_allocation = y
-			#if maximum[1] == None:
-				#raise ValueError("not possible to remain under variance threshold")
-			if maximum[1] != None:
-				maximum[2].append(max_allocation)
+
+			maximum[2].append(max_allocation)
 			self.cache[(j, x)] = maximum
 			return self.cache[(j, x)]
 
@@ -58,7 +57,7 @@ class Portfolio:
 	def return_from(self, allocation):
 		if len(allocation) != len(self.expectations):
 			raise ValueError("must allocate an amount to each investment project")
-		return (sum([self.expectations[i](allocation[i]) for i in range(len(allocation))]), sum([self.variances[i](allocation[i]) for i in range(len(allocation))]))
+		return (sum([self.expectations[i](allocation[i]) for i in range(1, len(allocation))]), sum([self.variances[i](allocation[i]) for i in range(1, len(allocation))]))
 
 
 
@@ -72,7 +71,9 @@ if __name__ == "__main__":
 		#.01
 		)
 
-	#print(my_portfolio.return_from([2,1,2]))
-	print(my_portfolio.max_return(5, 13))
+	print(my_portfolio.return_from([None, 0,0,5]))
+	print(my_portfolio.max_return(5, 9))
+	print(my_portfolio.max_return(5, 10))
 	print(my_portfolio.max_return(5, 14))
-	print(my_portfolio.max_return(5, 5))
+	print(my_portfolio.max_return(5, 6)) 
+	print(my_portfolio.max_return(5, 5)) # issue here still
