@@ -66,7 +66,8 @@ def maximal_return(m, n):
 	cache = dict()
 	return V(n, m)
 
-print(V(4, 1000))
+print(V(3, 5))
+print(V(3, 5))
 
 
 #print(sum([f1(2), f2(1), f3(2)]))
