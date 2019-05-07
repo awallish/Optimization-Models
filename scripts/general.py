@@ -15,9 +15,14 @@ def f3(x):
 def f4(x):
 	return (1+INTEREST_RATE)*x
 
+def g1(x):
+	return -3*x
+def g2(x):
+	return -1*x
+def g3(x):
+	return -3*x
 
-
-functions = [0, f1, f2, f3]
+functions = [0, f1, f2, f3, f4]
 
 
 amounts = []
@@ -27,35 +32,29 @@ amounts = []
 cache = dict()
 
 # at each stage return/cache how we got there
-
 def V(j, x):
+
 	if (j, x) in cache:
-		#print("yes")
 		return cache[(j,x)]
+	
 	if j == 1:
-		l = functions[j](x)
-		cache[(j,x)] = (l, [x])
+		cache[(j,x)] = (functions[j](x), [x])
 		return cache[(j,x)]
 
 	else:
 		maximum = (-float('inf'), None)
 		mac = 0
 		for y in range(0, x):
-
-			lek = V(j-1, x-y) 
-	  # when we recurse to the very top this will be all the way expanded out
-			curr = (lek[0] + functions[j](y), lek[1])
+			temp = V(j-1, x-y) 
+			curr = (temp[0] + functions[j](y), temp[1].copy())
 			if curr > maximum:
 				maximum = curr 
 				mac = y
-		while j <= len(maximum[1]) and sum([(functions[i](x)) for i, x in enumerate(maximum[1])]) != maximum[1]:
-			maximum[1].pop()
+
 		maximum[1].append(mac)
 		cache[(j, x)] = maximum
-		print(j, maximum)
 		return cache[(j,x)]
 """
-
 		res = max([(lambda y: (functions[j](y) + V(j-1, x-y)))(y) for y in range(0, x)])
 		cache[(j, x)] = res
 		return res
@@ -63,12 +62,16 @@ def V(j, x):
 
 # provides the maximum return when you have m dollars to invest among n projects
 def maximal_return(m, n):
+	global cache
+	cache = dict()
 	return V(n, m)
 
-print(V(3, 10))
-
-print(sum([f1(2), f2(1), f3(2)]))
-print(sum([f1(5), f2(2), f3(3)]))
+print(V(4, 1000))
 
 
+#print(sum([f1(2), f2(1), f3(2)]))
+#print(sum([f1(5), f2(2), f3(3)]))
 
+
+
+# m * (n+1)

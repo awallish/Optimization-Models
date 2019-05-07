@@ -1,34 +1,35 @@
 import math
 
-INTEREST_RATE = .02
-TOLERANCE = .80
+
+
+class Portfolio:
+
+
+	def __init__(self, expectations, variances, interest_rate=None):
+		self.expectations = expectations
+		self.variances = variances
+		if interest_rate != None:
+			self.expectations.append(lambda x: (1+interest_rate)*x)
+			self.variances.append(lambda _: 0)
+
+
+	# how to achieve maximal return, when you have m to invest, and your risk tolerance is given my sigma
+	def max_return(self, m, sigma):
+		return self.return_from(len(self.expectations), m, sigma)
+
+	def V(self, j, x, sig_bound):
+		pass
+
+	def return_from(self, allocation):
+		return (sum([self.expectations[i](allocation[i]) for i in range(len(allocation))]), sum([self.variances[i](allocation[i]) for i in range(len(allocation))]))
 
 
 
-def m1(x):
-	return (10 * x)/(1+x)
-def m2(x):
-	return (math.sqrt(x))
-def m3(x):
-	return 10*(1 - (math.e**(-x)))
-def m4(x):
-	return (1+INTEREST_RATE)*x
+if __name__ == "__main__":
+	my_portfolio = Portfolio(
+		[lambda x: (10 * x)/(1+x), lambda x:  (math.sqrt(x)), lambda x: 10*(1 - (math.e**(-x)))],
+		[lambda x: 5, lambda x: 8, lambda x: 1],
+		.01
+		)
 
-def s1(x):
-	pass
-def s2(x):
-	pass
-def s3(x):
-	pass
-def s4(x):
-	0
-
-
-
-
-expectations = [0, m1, m2, m3, m4]
-variances = [0, s1, s2, s3, s4]
-
-
-
-def V(j, x):
+	print(my_portfolio.return_from([2,1,2,5]))
