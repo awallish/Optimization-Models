@@ -22,3 +22,9 @@ Maybe i need to do this iteratively so that we can have the complete expanded fo
 
 
 stochastic calculus
+
+
+because we are not iterating over the entire range of sigma(x), we are not guaranteed any number of cache hits.  
+
+we are not guaranteed that V(j, x, sigma1) = V(j, x, sigma2), so we have to cache according to (j, x, sigma) not just (j, x)
+
