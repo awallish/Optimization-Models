@@ -28,3 +28,22 @@ because we are not iterating over the entire range of sigma(x), we are not guara
 
 we are not guaranteed that V(j, x, sigma1) = V(j, x, sigma2), so we have to cache according to (j, x, sigma) not just (j, x)
 
+
+
+perhaps the reason performance is so bad is because we have to try so many cases.
+
+In the worst case, there is only one possible solution which satisfies the sigma requiremnet, which means we will have no cache hits.  
+
+
+https://papers.ssrn.com/sol3/papers.cfm?abstract_id=305006 --
+hedge funds can have significantly lower risk, with statistically insignifact differences in expected return. 
+
+
+
+
+"Real World" Example.
+Hedge Fund which charges a heavy flat management fee upfront, but invests in securites that have no real upper bound. risk grows linearly. 
+
+Hedge Fund which employs statistical arb, and has upper bound.  Shows some sort of logistic growth.  risk grows exponentially. red and blue.
+
+Bond. Depositing in bank.  Linear growth.  risk is always zero.

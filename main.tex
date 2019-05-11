@@ -1,5 +1,18 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{amsmath}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+    pdftitle={Sharelatex Example},
+    bookmarks=true,
+    pdfpagemode=FullScreen,
+    }
 
 \title{A Dynamic Programming Algorithm for Optimization of Investment Project Allocation}
 \author{Alex Wallish}
@@ -18,18 +31,107 @@ Suppose one has $m$ dollars to invest among $n$ projects, and that investing $x$
 \section{Introduction}
 The problem of deciding what capital to allocate to what investment projects has many applications to both actuarial science and portfolio theory.  Often an investor or portfolio manager will have many possible investment vehicles available. An efficient algorithm for determining how much should be allocated into each investment project, so as to maximize return could prove to be very beneficial. In section 2 we will state a general problem, and give a DP algorithm for solving it.  In section 3, we will consider a more nuanced form of the problem and show how it could be beneficial.  In section 4 we will provide an algorithm for solving this problem.  And in section 5 we will make some observations about our algorithm. 
 
-\section{General Problem}
-Suppose that one has $m$ dollars to invest among $n$ projects and that investing $x$ in project $i$ yields a present value return of $f_{i}(x)$, $i = 1, ..., n$. The problem is to determine the integer amounts to invest in each project so as to maximize the sum of the returns.  That is, if we let $x_{i}$ denote the amount to be invested in project $i$, then our problem is to choose non-negative integers $x_{1}, ..., x_{n}$ such that $$\sum_{i=1}^{n}x_{i} = m$$ while maximizing $$\sum_{i=1}^{n} f_{i}(x_{i}).$$ Ross(source here) provides a general solution using dynamic programming:
+\section{Topic Review}
+Go over relevant terms.  Present Value. Expected Return. Portfolio Optimization and Portfolio Theory.  Variance of returns.  Capital allocation models.  
+
+
+\section{Literature Review}
+There is some literature related to our problem.  The problem itself is based on a more general problem and solution given by Sheldon M Ross in his book "An Elementary Introduction to Mathematical Finance."
+Suppose that one has $m$ dollars to invest among $n$ projects and that investing $x$ in project $i$ yields a present value return of $f_{i}(x)$, $i = 1, ..., n$. The problem is to determine the integer amounts to invest in each project so as to maximize the sum of the returns.  That is, if we let $x_{i}$ denote the amount to be invested in project $i$, then our problem is to choose non-negative integers $x_{1}, ..., x_{n}$ such that $$\sum_{i=1}^{n}x_{i} = m$$ while maximizing $$\sum_{i=1}^{n} f_{i}(x_{i}).$$
+\newline
+Ross(source here) provides a general solution using dynamic programming:
 \linebreak
 Let $P_{j}(x)$ denote the maximal possible sum of returns when we have a total of $x$ to invest in projects $1, ..., j$. So, with this notation, $P_{n}(m)$ represents the maximal value of the problem posed. Determining $P_{n}(m)$, and the optimal investment amounts begins by finding the values of $P_{j}(x)$ for $x = 1, ..., m$, first for $j = 1$, then for $j=2$, and so on up to $j=n$.
 \linebreak
-Because the maximum return when $x$ must be invested in project 1 is $f_{1}(x)$, we have that $$P_{1}(x) = f_{1}(x).$$
-Now, suppose that $x$ must be invested between projects 1 and 2. If we invest $y$ in project 2 then a total of $x-y$ is available to invest in project 1. Because the best return from having $x-y$ available to invest in project 1 is $P_{1}(x-y)$ it follows that the maximum sum of returns possible when the amount $y$ is invested in project 2 is $f_{2}(y) + P_{1}(x-y).$ As the maximum som of returns possible is obtained by maximizing the preceding over $y$, we see that 
+Because the maximum return when $x$ must be invested in project 1 is $f_{1}(x)$, we have that 
+\newline
+$$P_{1}(x) = f_{1}(x).$$
+\newline
+Now, suppose that $x$ must be invested between projects 1 and 2. If we invest $y$ in project 2 then a total of $x-y$ is available to invest in project 1. Because the best return from having $x-y$ available to invest in project 1 is $P_{1}(x-y)$ it follows that the maximum sum of returns possible when the amount $y$ is invested in project 2 is $f_{2}(y) + P_{1}(x-y).$ As the maximum sum of returns possible is obtained by maximizing the preceding over $y$, we see that $$P_{2}(x) = \max_{0\leq y\leq x} f_{2}(y) + P_{1}(x-y).$$
+In general, suppose that $x$ must be invested among projects $1, ..., j$. If we invest $y$ in project $j$ then a total of $x-y$ is available to invest in projects $1, ..., j-1$. Because the best return from having $x-y$ available to invest in projects $1, ..., j-1$ is $P_{j-1}(x-y)$, it follows that the maximal sum of returns possible when the amount y is invested in project $j$ is $f_{j}(y) + P_{j-1}(x-y).$ As the maximum sum of returns possible is obtained by maximizing the preceding over $y$, we see that 
+\newline
+$$P_{j}(x) = \max_{0\leq y\leq x} f_{j}(y) + P_{j-1}(x-y).$$
+\newline
+Now, we can obtain the optimal value $P_{n}(m)$ by first calculating $P_{1}(x)$ and then $P_{2}(x)$ and so on up until $P_{n}(m).$ 
+\newline
+This problem lends itself nicely to a dynamic programming implementation. Since we can cache the results to previous sub problems in order to determine the answer to our actual problem efficiently.  The pseudocode for our implementation of this algorithm is as follows:
+\newline
+\begin{lstlisting}
+def P(n, m):
+    if (n, m) not in cache:
+        if n == 1 -> cache[(n,m)] = functions[n](m)
+        else -> cache[(n,m)] = max {functions[n](y) + 
+        P(n-1, x-y) for y in range(0, m)}
+    return cache[(n,m)]
 
+\end{lstlisting}
+\newline
+The Python implementation for this algorithm, as well as for the algorithm we present in the next section is available  \href{http://www.github.com/awallish/optimization-models}{here}.
 
 \section{Stochastic Problem}
+Now that we have reviewed the general problem, and the solution presented in other literature, we are going to consider a new deviation of the general problem.  
+\breakline
+Suppose that we have m dollars to invest among n projects. Suppose that instead of having a simple, linear return function, our return function is instead a stochastic process. Also suppose that we have a certain risk tolerance $\sigma$. The problem is to determine the vector $<x_{1},...,x_{n}>$ such that investing $x_{j}$ in project $j$ will return the maximum expected return all while keeping the sum of variance under $s$. Essentially, we are looking for the vector $<x_{1},...,x_{n}>$ such that 
+$$\sum_{i=1}^{n}x_{i} = m$$
+and
+$$\sum_{i=1}^{n} E[f_{i}(x_{i})] is maximized$$
+and
+$$\sum_{i=1}^{n} Var[f_{i}(x_{i})] \leq s$$
 
-\section{Stochastic Solution}
+
+
+\breakline
+Since f is now a stochastic process, this means that for project $j$,  $f_{j}(x)$ does not tell us exactly how much we will be getting in return, rather, $f_{j}(x)$ is a random variable with an expected value and a variance. There are a number of different ways of representing stochastic processes, but for our purposes we are simply going to represent $f(x)$ as two linear functions. One, call it $\mu(x)$, which represents the expected return at x, and another, $\sigma(x)$ which represents the volatility at x.  Neither $\mu(x)$ nor $\sigma(x)$ must be continuous.  
+\newline
+Now that we have decided how we are going to represent our process, we can better classify the problem.  We are looking for the vector $<x_{1},...,x_{n}>$ which maximizes 
+$$\sum_{i=1}^{n} \mu{i}(x_{i})$$
+such that
+$$\sum_{i=1}^{n}x_{i} = m$$
+and
+$$\sum_{i=1}^{n} \sigma_{i}(x_{i}) \leq s$$
+\newline
+The first important observation we are going to make is that it is very possible that for some functions and $s$, there is no possible solution. Since we require that all of our $m$ dollars must be invested, then there will be no possible solution under the following conditions:
+\newline
+if for all possible ways to allocate the $m$ dollars to the projects, 
+$$\sum_{i=1}^{n} \sigma_{i}(x_{i}) > s$$
+Because of this, we will have to have a way of handling no possible solution in our algorithm.  
+\newline
+In developing our algorithm, we take a similar approach to the algorithm proposed by Sheldon M. Ross, as detailed in the previous section.
+\newline
+We are going to define $V_{n}(m, s)$ to be the maximal return from investing $m$ in the first $n$ projects.  If there is no such possible solution, then it will be None.
+\newline
+Now, we are going to start by observing that if there is only one project to invest $x$ in, and there is a risk tolerance of s, then 
+
+\[V_{1}(x, s) =  \begin{cases} 
+      \mu_{1}(x) & \sigma_{1}(x) \leq s \\
+      None & \sigma_{1}(x) > s \\
+   \end{cases}
+\]
+
+
+
+Now, if we suppose that $x$ must be invested in projects 1 and 2, with a risk tolerance of s, then the maximum return will be given by 
+$$V_{2}(x, s) = \max_{0\leq y\leq x} \mu_{2}(y) + V_{1}(x-y, s-\sigma_{2}(y)).$$
+if this happens to be None then consider the next biggest.  If they are all None, then return None.
+\newline
+So, in general, we can see a pattern:
+$$V_{j}(x, s) = \max_{0\leq y\leq x} \mu_{j}(y) + V_{j-1}(x-y,  s-\sigma_{j}(y)).$$
+if there is no such maximum then there is no possible solution.
+\newline
+Implementing this will be a bit more difficult than implementing the general solution.  For one, we will now have to cache solutions to sub-problems in terms of $j, x,$ and $s$ instead of just $j$ and $x$.  This is because it can be shown that it is not necessarily the case that $V_{j}(x, s1) = V_{j}(x, s2)$ for $s1 \neq s2$.
+Also, we will have to be aware that previous problems may return None, and we will have to be able to handle this. Also, we can no longer simply take the max, but rather we must take the largest possible which also satisfies the condition that $s-\sigma_{j}(y)>0$ and $V_{j-1}(x-s, s-\sigma_{j}(y)) \neq None$. 
+\newline
+Here is the pseudocode for our algorithm:
+\newline
+\begin{lstlisting}
+def V(m, n, s):
+    if (m, n, s) not in cache:
+        if n == 1 -> cache[(j,x)] = functions[j](x)
+        else -> cache[(j,x)] = max {functions[j](y) + 
+        P(j-1, x-y) for y in range(0, x)}
+    return cache[(m, n, s)]
+
+\end{lstlisting}
 
 \section{Observations}
 
