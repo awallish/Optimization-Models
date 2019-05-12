@@ -3,6 +3,8 @@
 \usepackage{listings}
 \usepackage{hyperref}
 \usepackage{amsmath}
+\usepackage{amssymb}
+
 
 \hypersetup{
     colorlinks=true,
@@ -32,12 +34,12 @@ Suppose one has $m$ dollars to invest among $n$ projects, and that investing $x$
 The problem of deciding what capital to allocate to what investment projects has many applications to both actuarial science and portfolio theory.  Often an investor or portfolio manager will have many possible investment vehicles available. An efficient algorithm for determining how much should be allocated into each investment project, so as to maximize return could prove to be very beneficial. In section 2 we will state a general problem, and give a DP algorithm for solving it.  In section 3, we will consider a more nuanced form of the problem and show how it could be beneficial.  In section 4 we will provide an algorithm for solving this problem.  And in section 5 we will make some observations about our algorithm. 
 
 \section{Topic Review}
-Go over relevant terms.  Present Value. Expected Return. Portfolio Optimization and Portfolio Theory.  Variance of returns.  Capital allocation models.  
+In finance, portfolio managers will often have many different investment opportunities available to them, and will want to decide how to allocate their capital so as to achieve the greatest return.  But that is not the only thing they are concerned about.  Often, they are also concerned with minimizing risk, and are willing to do that at cost of a lower expected return. In finance, we often see investment projects whose returns tend to follow a stochastic process, rather than have a guaranteed return.  A stochastic process is simply a collection of random variables, and there are many such models for them.  One of the most common in finance is geometric Brownian Motion, which is often used to model the return of a security.  Other common stochastic processes in finance are Markov Chains, Random Walks, and Poisson Processes.  We won't worry too much about any of these specific processes in this paper, but will rather focus on the core idea.  They can be thought of as a function, which returns different random variables with different inputs.  Random variables are simply quantities whose outcome depend on some random phenomenon.  Random variables have an expected value and a variance.  The expected value is what the random variable converges to under many trials, and the variance is a measure of how close the average sample is to that mean.  We will be using these things throughout this paper to study an algorithm for portfolio optimization.  
 
 
 \section{Literature Review}
 There is some literature related to our problem.  The problem itself is based on a more general problem and solution given by Sheldon M Ross in his book "An Elementary Introduction to Mathematical Finance."
-Suppose that one has $m$ dollars to invest among $n$ projects and that investing $x$ in project $i$ yields a present value return of $f_{i}(x)$, $i = 1, ..., n$. The problem is to determine the integer amounts to invest in each project so as to maximize the sum of the returns.  That is, if we let $x_{i}$ denote the amount to be invested in project $i$, then our problem is to choose non-negative integers $x_{1}, ..., x_{n}$ such that $$\sum_{i=1}^{n}x_{i} = m$$ while maximizing $$\sum_{i=1}^{n} f_{i}(x_{i}).$$
+Suppose that one has $m$ dollars to invest among $n$ projects and that investing $x$ in project $i$ yields a present value return of $$f_{i}(x)$$, for $$i = 1, ..., n$$. The problem is to determine the integer amounts to invest in each project so as to maximize the sum of the returns.  That is, if we let $x_{i}$ denote the amount to be invested in project $i$, then our problem is to choose non-negative integers $x_{1}, ..., x_{n}$ such that $$\sum_{i=1}^{n}x_{i} = m$$ while maximizing $$\sum_{i=1}^{n} f_{i}(x_{i}).$$
 \newline
 Ross(source here) provides a general solution using dynamic programming:
 \linebreak
@@ -124,16 +126,55 @@ Also, we will have to be aware that previous problems may return None, and we wi
 Here is the pseudocode for our algorithm:
 \newline
 \begin{lstlisting}
+define rets to be an array of the expected return functions
+define vars to be an array of the variance functions
 def V(m, n, s):
     if (m, n, s) not in cache:
-        if n == 1 -> cache[(j,x)] = functions[j](x)
-        else -> cache[(j,x)] = max {functions[j](y) + 
-        P(j-1, x-y) for y in range(0, x)}
+        if n < 0  
+            cache[(m, n, s)] = -inf
+        else if n == 1  
+            cache[(m,n,s)] = rets[n](m) if 
+            rets[n](m) - vars[n](m) > 0 else -inf
+        else 
+            max = -inf
+            for y in range(0, m)
+                if s - vars[n](m) > 0 and V(m-y, n-1, s-vars[n](y)
+                    max = V(m-y, n-1, s-vars[n](y)
+            cache[(m, n, s)] = max
     return cache[(m, n, s)]
 
 \end{lstlisting}
+\newline
+\newline
+\newline
+Let us now consider a working example.  Suppose you have \$10,000 to invest among 3 projects.  The functions of expected returns for investing $x$ dollars are as follows:
+$$\mu_{1}(x) = \dfrac{10000}{1+e^{-.001(x-100)}}-5000$$
+$$\mu_{2}(x) = \dfrac{20000}{1+e^{-.0004(x-100)}}-11600$$
+$$\mu_{3}(x) = 1.06*x$$
+and the corresponding variance functions are:
+$$\sigma_{1}(x) = .001x^{1.7}$$
+$$\sigma_{2}(x) = \dfrac{x}{3}$$
+$$\sigma_{3}(x) = 0.$$
+Suppose our investor wants to maximize possible return while keeping variance under 1500.
+Calling $$V(10000, 3, 1500)$$ would output $$[1800, 4730, 3470]$$ which means our investor would want to invest 1800 in project 1, 4730 in project 2, and 3470 in project 3. 
+\newline The total return would be $$\mu_{1}(1800) + \mu_{2}(4730) + \mu_{3}(3470) = 12745.20 $$ and the total variance would be $$\sigma_{1}(1800) + \sigma_{2}(4730) + \sigma_{3}(3470) = 1497.46 \leq 1500 \hspace{.5cm} \checkmark$$
+\newline
+Or, suppose our investor is much more conservative, and wants to keep variance under 500.  Calling $$V(10000, 3, 500)$$ would output $$[1300, 7790, 910]$$. 
+\newline The total return would be $$\mu_{1}(1300) + \mu_{2}(7790) + \mu_{3}(910) = 10948.62 $$ and the total variance would be $$\sigma_{1}(1300) + \sigma_{2}(7790) + \sigma_{3}(910) = 499.68 \leq 1500 \hspace{.5cm} \checkmark$$
+\newline
+If our investor doesn't care about risk at all, and simply wants to maximize expected return no matter what, they can pass in infinity, or maxint as the third parameter.  The Python call would look like $$V(10000, 3, float('inf'))$$ and would output $$[2090, 3610, 4300]$$. This is essentially the same problem as the general problem we considered in the previous problem.  
+The total return would be $$\mu_{1}(2090) + \mu_{2}(3610) + \mu_{3}(4300) = 12882.12 $$ and the total variance would be $$\sigma_{1}(2090) + \sigma_{2}(3610) + \sigma_{3}(4300) = 1872.71 $$
 
-\section{Observations}
+\section{Analysis}
+The solution to the general problem benefited greatly by using a dynamic programming solution.  Using a cache to not have to redo computations effectively reduced the runtime from $$O(n^{m})$$ to $$O(n*m)$$ where n is the number of investment projects, and m is the amount to invest.  This reduction in worst case behavior is due to the fact that we are never going to have to recompute a sub problem more than once.  
+\newline
+With the problem that we have presented an algorithm for, the problem where our returns are given by a stochastic process, we don't see the same improvement.  The runtime of this problem, without dynamic programming is $$O(n^{m})$$ again since in the worst case, we would have to compute each sub problem exactly once. With our dynamic programming algorithm that we presented in the previous section, we don't see an improvement in worst case runtime; the runtimes is still $$O(n^{m})$$. This is largely due to the fact that our cache is now storing values in terms of three variables and we are no longer guaranteed any cache hits at all.  
+\newline
+It can be shown that $$V(j, x, s1)$$ is not necessarily equal to $$V(j, x, s2)$$ for $$s1 != s2$$.
+\newline
+Since we are not iterating over the entire range of $$\mu_{n}(m),$$ we are not guaranteed that that final $s$ term will have ever been seen before.  This means that we are not guaranteed any cache hits. And because of this, in the worst case, we will not have any cache hits at all and our runtime will still be $n^{m}$. In the worst case, there is only one possible solution which satisfies the risk requirement, and it happens to be the last one, so all possible solutions must be checked to determine it.  
+\newline
+This is not to say that caching the results to previous subproblems is all bad.  In fact, we have found that it actually reduces the average runtime significantly in many cases. However, not by an order of magnitude, since the cache hits are much more infrequent.  We've also found that a higher correlation between the variance and expected return functions produces more cache hits, as do linear variance functions. In summary, the number of cache hits for our algorithm is not guaranteed, and is highly dependent on the inputs.  
 
 
 \end{document}

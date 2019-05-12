@@ -50,7 +50,7 @@ class Portfolio:
 			self.count += 1
 			maximum = (-float('inf'), 0, [x])
 			max_allocation = None
-			for y in range(0, x+1,1):
+			for y in range(0, x, 10):
 				if sigma-self.variances[j](y) >= 0:
 					temp = self.V(j-1, x-y, sigma-self.variances[j](y))
 					curr = (temp[0] + self.expectations[j](y), temp[1] + self.variances[j](y), temp[2])
@@ -83,14 +83,16 @@ class Portfolio:
 
 if __name__ == "__main__":
 	rw = Portfolio(
-		[None, lambda x: 10000/(1 + math.e**(-.001*(x-100)))-5000, lambda x: 1.06*x, lambda x: 20000/(1 + math.e**(-.0004*(x-100)))-11598.323],
+		[None, lambda x: 10000/(1 + math.e**(-.001*(x-100)))-5000, lambda x: 1.06*x, lambda x: 20000/(1 + math.e**(-.0004*(x-100)))-11600],
 		[None, lambda x: .001*x**1.7, lambda x: 0, lambda x: .333*x]
 		)
-	print(rw.max_return(10000, float('inf')))
-	print(rw.max_return(10000, 1800))
-	print(rw.max_return(10000, 1500))
+	#print(rw.max_return(10000, float('inf')))
+	#print(rw.max_return(10000, 1800))
+	#print(rw.max_return(10000, 1500))
 	print(rw.max_return(10000, 1000))
-	print(rw.max_return(10000, 500))
+	#print(rw.max_return(10000, 500))
+	print(rw.count)
+	print(rw.cache_hits)
 	"""my_portfolio = Portfolio(
 		[None, lambda x: 5/2*x ,lambda x: (10 * x)/(1+x), lambda x:  (math.sqrt(x)), lambda x: 10*(1 - (math.e**(-x)))],
 		[None, lambda x: 1*x, lambda x: 2*x, lambda x: 8*x, lambda x: 1*x],
