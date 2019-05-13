@@ -31,9 +31,21 @@ x = np.array(range(0, 10000, 10))
 plt.axis([0, 10000, -1000, 7000])
 plt.plot(x, functions[2](x))
 plt.plot(x, variances[2](x), 'r')
+plt.plot(4722,functions[2](4722) , 'g', marker='o', markersize=12)
+plt.plot(4722,variances[2](4722) , 'g',marker='o', markersize=12)
+plt.plot(7782,functions[2](7782) , 'm',marker='o', markersize=12)
+plt.plot(7782,variances[2](7782) , 'm',marker='o', markersize=12)
+plt.plot(3615,functions[2](3615) , 'k',marker='o', markersize=12)
+plt.plot(3615,variances[2](3615) , 'k',marker='o', markersize=12)
+
 plt.show()
 
+"""
+(12747.012763311423, 1499.979826100308, [1816, 4722, 3462])
+(10949.578416350223, 499.92101690060855, [1333, 7782, 885])
+(12882.124282351195, 1870.940962595616, [2086, 3615, 4299])
 
+"""
 
 
 """

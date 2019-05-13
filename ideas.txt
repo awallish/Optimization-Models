@@ -52,10 +52,9 @@ Bond. Depositing in bank.  Linear growth.  risk is always zero.
 
 
 TODO:
-Second set of graphs
-Add A Source or Two
-Add citations
-Improve abstract
-Add University to title page
+
+REDO abstract
 proofread
-check analysis section
+clean up code and add github link
+email github link
+print
