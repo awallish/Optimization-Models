@@ -47,3 +47,15 @@ Hedge Fund which charges a heavy flat management fee upfront, but invests in sec
 Hedge Fund which employs statistical arb, and has upper bound.  Shows some sort of logistic growth.  risk grows exponentially. red and blue.
 
 Bond. Depositing in bank.  Linear growth.  risk is always zero.
+
+
+
+
+TODO:
+Second set of graphs
+Add A Source or Two
+Add citations
+Improve abstract
+Add University to title page
+proofread
+check analysis section
